@@ -1,0 +1,7 @@
+torch>=2.2
+transformers>=4.40
+datasets>=2.18
+numpy>=1.26
+scipy>=1.11
+matplotlib>=3.8
+pytest>=8.0
