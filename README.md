@@ -36,6 +36,13 @@ perplexity.
 
 ![Pareto front](results/figures/pareto.png)
 
+Two alternative explanations were tested and rejected. Attenuation alone: the
+denoiser keeps 8-48% of the injection, and plain steering across that effective
+range reaches only 0.065-0.106. Generic contraction: replacing the denoiser with
+`x <- mu + gamma (x - mu)` gives perplexity 928 (gamma=0.4) and 561 (gamma=0.7)
+at alpha=1.0, against the denoiser's 88.8 -- worse than plain steering, and no
+contraction setting lands on the Pareto front.
+
 The refinement proposed in the method below -- protecting the injected component
 from the denoiser -- was measured and does **not** work. The denoiser cancels
 52-92% of what was injected, and that cancellation turns out to be the mechanism
@@ -108,6 +115,8 @@ python -m scripts.analyze
 ```
 
 ## Layout
+
+Trained denoiser: [mariakasimceva/steering-denoiser](https://huggingface.co/mariakasimceva/steering-denoiser).
 
 ```
 msteer/concepts.py   concepts, seed and probe lexicons, dev / held-out split

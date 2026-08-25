@@ -24,7 +24,9 @@ RESULTS = Path("results")
 FIGS = RESULTS / "figures"
 MODE_LABEL = {"steer": "steering",
               "denoise": "denoiser",
-              "denoise_orth": "denoiser, orthogonal correction"}
+              "denoise_orth": "denoiser, orthogonal correction",
+              "shrink_g0.4": "linear shrinkage, gamma=0.4",
+              "shrink_g0.7": "linear shrinkage, gamma=0.7"}
 
 
 def rows() -> list[dict]:

@@ -12,17 +12,23 @@ whole range from clean to pure noise with a bounded input scale, which matters
 because a steered state h + alpha*v is far outside the range that a fixed
 sigma would produce.
 
-Application. The naive use is h~ = D(h + alpha*v). It has a defect that is
-visible as soon as the correction is decomposed: a prior fitted to natural
-activations treats the injected component itself as the anomaly, so a large
-part of D(h + alpha*v) - (h + alpha*v) points along -v and simply undoes the
-intervention. The orthogonal variant keeps the component of the correction that
-is orthogonal to v and discards the parallel one:
+Application. Two variants are implemented and compared.
 
-    h~ = x + P_perp_v [ D(x) - x ],   x = h + alpha*v
+    denoise      h~ = D(x)
+    denoise_orth h~ = x + P_perp_v [ D(x) - x ],   x = h + alpha*v
 
-so the intervention survives at full strength while the off-manifold artefacts
-it introduced are removed.
+The second was proposed on the following argument: a prior fitted to natural
+activations treats the injected component itself as the anomaly, so much of
+D(x) - x points along -v and undoes the intervention; keeping only the
+orthogonal part of the correction should preserve the steering at full strength
+while removing the artefacts. The measurement confirms the premise -- the
+denoiser cancels 52 to 92 per cent of what was injected -- and refutes the
+conclusion: denoise_orth is worse on both axes. The cancellation is the
+mechanism, not a defect. Holding the injection at full strength keeps the state
+off-manifold and the text collapses into repetition.
+
+A third mode, ``shrink``, is the control for whether a learned prior is needed
+at all; see make_shrinkage.
 """
 
 from __future__ import annotations
@@ -95,8 +101,28 @@ def corrupt(z: torch.Tensor, generator: torch.Generator | None = None
     return t * z + (1 - t) * eps
 
 
+def make_shrinkage(mean: torch.Tensor, gamma: float):
+    """Linear contraction of the state towards the mean of natural activations.
+
+    The control for the claim that the denoiser does anything a learned prior
+    is needed for. Steering inflates the norm of the state; if a one-line
+    contraction towards the centre of the activation distribution reproduced
+    the denoiser's front, the 6.9M-parameter prior would be redundant. Sweeping
+    alpha does not answer this: alpha changes the size of the injection before
+    it happens, while a contraction acts afterwards and also shrinks the
+    natural part of h.
+    """
+
+    def shrink(x: torch.Tensor) -> torch.Tensor:
+        mu = mean.to(x.dtype).to(x.device)
+        return mu + gamma * (x - mu)
+
+    return shrink
+
+
 def make_intervention(v: torch.Tensor, alpha: float, scale: float,
-                      denoiser: Denoiser | None, mode: str):
+                      denoiser: Denoiser | None, mode: str,
+                      shrink_gamma: float = 0.5):
     """Returns the function applied to the residual stream at the hook point.
 
     ``alpha`` is measured in units of the mean activation norm, so the injected
@@ -121,11 +147,16 @@ def make_intervention(v: torch.Tensor, alpha: float, scale: float,
         parallel = (delta @ u).unsqueeze(-1) * u
         return x + (delta - parallel)
 
+    def shrink_only(h: torch.Tensor) -> torch.Tensor:
+        return make_shrinkage(denoiser.mean, shrink_gamma)(steer(h))
+
     if mode == "denoise":
         return denoise
     if mode == "denoise_orth":
         return denoise_orth
+    if mode == "shrink":
+        return shrink_only
     raise ValueError(f"unknown mode: {mode}")
 
 
-MODES = ("steer", "denoise", "denoise_orth")
+MODES = ("steer", "denoise", "denoise_orth", "shrink")

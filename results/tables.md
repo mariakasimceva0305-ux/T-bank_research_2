@@ -19,6 +19,12 @@
 | development | denoiser, orthogonal correction | 0.8 | 0.203 | 29.95 | 1.34 | 375.3 | 0.403 |
 | development | denoiser, orthogonal correction | 1 | 0.205 | 30.09 | 1.83 | 425.1 | 0.384 |
 | development | denoiser, orthogonal correction | 1.5 | 0.232 | 27.14 | 2.14 | 489.9 | 0.326 |
+| development | linear shrinkage, gamma=0.4 | 0.6 | 0.224 | 2.35 | 0.02 | 239.9 | 0.529 |
+| development | linear shrinkage, gamma=0.4 | 1 | 0.172 | 0.71 | 0.08 | 527.6 | 0.511 |
+| development | linear shrinkage, gamma=0.4 | 1.5 | 0.189 | 1.17 | 0.00 | 792.9 | 0.594 |
+| development | linear shrinkage, gamma=0.7 | 0.6 | 0.178 | 0.68 | 0.00 | 340.1 | 0.650 |
+| development | linear shrinkage, gamma=0.7 | 1 | 0.179 | 0.86 | 0.00 | 347.0 | 0.482 |
+| development | linear shrinkage, gamma=0.7 | 1.5 | 0.179 | 3.33 | 0.00 | 351.2 | 0.339 |
 | held out | steering | 0 | 0.031 | 0.00 | 0.10 | 11.3 | 0.875 |
 | held out | steering | 0.2 | 0.065 | 0.02 | 0.25 | 21.7 | 0.814 |
 | held out | steering | 0.4 | 0.106 | 0.00 | 0.17 | 272.0 | 0.784 |
@@ -38,3 +44,9 @@
 | held out | denoiser, orthogonal correction | 0.8 | 0.070 | 0.00 | 0.00 | 444.3 | 0.447 |
 | held out | denoiser, orthogonal correction | 1 | 0.078 | 0.00 | 0.00 | 421.4 | 0.398 |
 | held out | denoiser, orthogonal correction | 1.5 | 0.099 | 0.00 | 0.00 | 371.1 | 0.292 |
+| held out | linear shrinkage, gamma=0.4 | 0.6 | 0.112 | 0.00 | 0.86 | 232.1 | 0.639 |
+| held out | linear shrinkage, gamma=0.4 | 1 | 0.143 | 0.02 | 2.50 | 927.6 | 0.656 |
+| held out | linear shrinkage, gamma=0.4 | 1.5 | 0.111 | 0.00 | 0.45 | 1745.8 | 0.778 |
+| held out | linear shrinkage, gamma=0.7 | 0.6 | 0.141 | 0.00 | 1.13 | 668.9 | 0.813 |
+| held out | linear shrinkage, gamma=0.7 | 1 | 0.079 | 0.00 | 0.03 | 560.9 | 0.623 |
+| held out | linear shrinkage, gamma=0.7 | 1.5 | 0.078 | 0.00 | 0.00 | 336.7 | 0.372 |
