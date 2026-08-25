@@ -10,12 +10,37 @@ This repository asks what to do with the steered state before the model
 continues to read it, and answers with a small denoiser trained on natural
 activations plus one change in how its output is used.
 
-## Result in one line
+## Results
 
-On held-out concepts the denoiser reaches a topic score of 0.249 at perplexity
-88.8, where plain steering never exceeds 0.106 and pays 272 perplexity for it.
-The refinement proposed below it -- protecting the injected component from the
-denoiser -- was measured and does **not** work; see `report/report.md`, section 5.
+Held-out concepts, mean over four. `seed` and `probe` are words per 100
+generated words from two disjoint lexicons: the direction is built from the
+seed words, the probe words are never seen by it.
+
+| mode | alpha | topic | seed/100 | probe/100 | perplexity | distinct-2 |
+|---|---|---|---|---|---|---|
+| unsteered | 0 | 0.031 | 0.00 | 0.10 | 11.3 | 0.875 |
+| steering | 0.4 | 0.106 | 0.00 | 0.17 | 272.0 | 0.784 |
+| steering | 1.0 | 0.071 | 0.00 | **0.00** | 304.4 | 0.443 |
+| steering | 1.5 | 0.099 | 0.00 | **0.00** | 285.6 | 0.277 |
+| denoiser | 0.6 | 0.102 | 0.10 | 1.34 | **29.4** | 0.796 |
+| denoiser | 1.0 | 0.249 | 2.40 | **4.16** | 88.8 | 0.742 |
+| denoiser | 1.5 | **0.297** | 15.99 | 3.68 | 325.6 | 0.660 |
+| orthogonal | 1.0 | 0.078 | 0.00 | 0.00 | 421.4 | 0.398 |
+
+Plain steering at alpha >= 0.6 emits **no** probe words at all: it raises the
+probability of exactly the eight tokens the direction was built from and
+nothing beyond them. The denoiser at alpha = 1.0 emits 4.16 probe words per 100
+against 2.40 seed words -- more generalised vocabulary than literal. It reaches
+a topic score of 0.249 where steering never exceeds 0.106, at a third of the
+perplexity.
+
+![Pareto front](results/figures/pareto.png)
+
+The refinement proposed in the method below -- protecting the injected component
+from the denoiser -- was measured and does **not** work. The denoiser cancels
+52-92% of what was injected, and that cancellation turns out to be the mechanism
+rather than a defect. See `report/report.md`, section 5, for the evidence and
+for the control that rules out "the denoiser is just a smaller alpha".
 
 ## Method
 
