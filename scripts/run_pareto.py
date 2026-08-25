@@ -35,6 +35,12 @@ def main() -> None:
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--max_new_tokens", type=int, default=32)
     ap.add_argument("--out", default="results/pareto.jsonl")
+    # The denoiser is trained once, but the whole comparison rests on that one
+    # set of weights; repeating it on independently trained denoisers separates
+    # the method from the particular fit.
+    ap.add_argument("--denoiser_seed", type=int, default=0)
+    ap.add_argument("--modes", default="")
+    ap.add_argument("--alphas", default="")
     args = ap.parse_args()
 
     RESULTS.mkdir(exist_ok=True)
@@ -50,8 +56,11 @@ def main() -> None:
     for name in names:
         concept = by_name(name)
         v = concept_vector(model, tok, concept)
-        for mode in MODES:
-            for alpha in ALPHAS:
+        modes = args.modes.split(",") if args.modes else MODES
+        alphas = ([float(a) for a in args.alphas.split(",")]
+                  if args.alphas else ALPHAS)
+        for mode in modes:
+            for alpha in alphas:
                 if alpha == 0.0 and mode != "steer":
                     continue          # identical to the unsteered baseline
                 texts: list[str] = []
@@ -72,6 +81,7 @@ def main() -> None:
                     perplexity=continuation_perplexity(model, tok, prompts, texts),
                     distinct_2=distinct_n(texts, 2),
                     n_samples=len(texts),
+                    denoiser_seed=args.denoiser_seed,
                     sample=texts[0].replace("\n", " ")[:160],
                 )
                 out.write(json.dumps(row) + "\n")

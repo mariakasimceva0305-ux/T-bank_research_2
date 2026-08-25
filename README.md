@@ -36,6 +36,11 @@ perplexity.
 
 ![Pareto front](results/figures/pareto.png)
 
+Repeated over three independently trained denoisers, the topic score at
+alpha = 1.0 is 0.249 / 0.202 / 0.253 and the probe count 4.16 / 4.87 / 3.91.
+Plain steering is exactly 0.00 probe words on every seed. The spread across
+seeds (±0.025) is an order of magnitude below the effect (0.14-0.20).
+
 Two alternative explanations were tested and rejected. Attenuation alone: the
 denoiser keeps 8-48% of the injection, and plain steering across that effective
 range reaches only 0.065-0.106. Generic contraction: replacing the denoiser with

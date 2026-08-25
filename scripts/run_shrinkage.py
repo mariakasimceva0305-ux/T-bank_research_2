@@ -63,6 +63,7 @@ def main() -> None:
                     perplexity=continuation_perplexity(model, tok, prompts, texts),
                     distinct_2=distinct_n(texts, 2),
                     n_samples=len(texts),
+                    denoiser_seed=0,
                     sample=texts[0].replace("\n", " ")[:160],
                 )
                 out.write(json.dumps(row) + "\n")
