@@ -12,7 +12,7 @@ activations plus one change in how its output is used.
 
 ## Results
 
-Held-out concepts, mean over four. `seed` and `probe` are words per 100
+Base denoiser seed 0; held-out concepts, mean over four. `seed` and `probe` are words per 100
 generated words from two disjoint lexicons: the direction is built from the
 seed words, the probe words are never seen by it.
 
@@ -34,14 +34,14 @@ against 2.40 seed words -- more generalised vocabulary than literal. It reaches
 a topic score of 0.249 where steering never exceeds 0.106, at a third of the
 perplexity.
 
-![Pareto front](results/figures/pareto.png)
+![Pareto front](results/analysis_denoiser_0/figures/pareto.png)
 
 Repeated over three independently trained denoisers, the topic score at
 alpha = 1.0 is 0.249 / 0.202 / 0.253 and the probe count 4.16 / 4.87 / 3.91.
 Plain steering is exactly 0.00 probe words on every seed. The spread across
 seeds (±0.025) is an order of magnitude below the effect (0.14-0.20).
 
-Two alternative explanations were tested and rejected. Attenuation alone: the
+Two alternative explanations were evaluated under the same experimental settings. Attenuation alone: the
 denoiser keeps 8-48% of the injection, and plain steering across that effective
 range reaches only 0.065-0.106. Generic contraction: replacing the denoiser with
 `x <- mu + gamma (x - mu)` gives perplexity 928 (gamma=0.4) and 561 (gamma=0.7)
@@ -134,3 +134,9 @@ scripts/             data, training, the alpha sweep, tables and figures
 report/report.md     the study
 tests/               lexicon disjointness, the invariant of the orthogonal mode
 ```
+
+## Seed-aware analysis — 2026-10-10
+
+7 tests pass. All 248 saved records were reanalysed with explicit denoiser seeds. For four held-out concepts at alpha=1, topic similarity is 0.2487 / 0.2025 / 0.2529 and perplexity is 88.79 / 68.31 / 114.96. Means over three trained denoisers are 0.2347 and 90.69. This is reanalysis of saved generations, not new training.
+
+`python -m scripts.analyze --denoiser-seed 0` regenerates the base-run tables and figures without loading models for decomposition. Use `--decomposition` to recompute decomposition for the base checkpoint.

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import argparse
 from pathlib import Path
 
 import numpy as np
@@ -155,16 +156,28 @@ def table_markdown(data: list[dict]) -> str:
 
 
 def main() -> None:
+    global FIGS
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--denoiser-seed", type=int, default=0)
+    parser.add_argument("--decomposition", action="store_true")
+    args = parser.parse_args()
+    output = RESULTS / f"analysis_denoiser_{args.denoiser_seed}"
+    FIGS = output / "figures"
     FIGS.mkdir(parents=True, exist_ok=True)
-    data = rows()
+    data = [r for r in rows() if r.get("denoiser_seed", 0) == args.denoiser_seed]
+    if not data:
+        raise ValueError("No rows for selected denoiser")
     summary: dict = {}
     text = table_markdown(data)
-    (RESULTS / "tables.md").write_text(text, encoding="utf-8")
+    (output / "tables.md").write_text(text, encoding="utf-8")
     print(text)
     figure_pareto(data)
     figure_alpha(data)
-    decomposition(summary)
-    (RESULTS / "analysis.json").write_text(json.dumps(summary, indent=2))
+    if args.decomposition:
+        if args.denoiser_seed != 0:
+            raise ValueError("Decomposition currently loads base checkpoint only")
+        decomposition(summary)
+    (output / "analysis.json").write_text(json.dumps(summary, indent=2))
     front = pareto_front([(r["topic_similarity"], r["perplexity"]) for r in data])
     print(f"\nnon-dominated configurations: "
           f"{sorted({(data[i]['mode'], data[i]['alpha']) for i in front})}")
